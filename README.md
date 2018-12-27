@@ -9,7 +9,14 @@
 插件开发参考了[https://blog.csdn.net/deirjie/article/details/77043954](https://blog.csdn.net/deirjie/article/details/77043954)。
 我使用的是QGIS 3，所以安装的插件是QGIS Plugin Builder 3。
 
-创建时基本按照提示一路向前，设置为实验性项目，项目主页为当前项目[QGIS-encoding](https://github.com/asdawn/QGIS-encoding)。Windows下出现各种问题，包括缺失pyrcc5、pip3失灵等，于是直接在Mac下折腾...
+创建时基本按照提示一路向前，设置为实验性项目，项目主页为当前项目[QGIS-encoding](https://github.com/asdawn/QGIS-encoding)。Windows下出现各种问题，包括缺失pyrcc5、pip3失灵等，于是直接在Mac OS下折腾。
+
+安装了以下包：
+
+`pip3 install pyqt5`
+
+`pip3 install pyqt5-tools`
+
 
 
 
