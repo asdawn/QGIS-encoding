@@ -26,6 +26,7 @@ import os
 
 from PyQt5 import uic
 from PyQt5 import QtWidgets
+from qgis.gui import QgsFileWidget
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
@@ -42,3 +43,7 @@ class EncodingConverterDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+        self.format.addItem("ESRI Shape file (*.shp)")
+        self.format.addItem("MapInfo Mif file (*.mif)")
+        self.folderIn.setStorageMode(QgsFileWidget.GetDirectory)
+        self.folderOut.setStorageMode(QgsFileWidget.GetDirectory)

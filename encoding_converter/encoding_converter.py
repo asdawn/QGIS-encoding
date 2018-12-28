@@ -24,12 +24,16 @@
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
-
+from PyQt5 import QtWidgets
+from qgis.core import QgsVectorLayer
+from qgis.core import QgsVectorFileWriter
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
 from .encoding_converter_dialog import EncodingConverterDialog
 import os.path
+import os
+from qgis.gui import QgsMessageBar
 
 
 class EncodingConverter:
@@ -68,6 +72,10 @@ class EncodingConverter:
         # Check if plugin was started the first time in current QGIS session
         # Will be set False once it was started
         self.first_start = True
+        self.dlg = None
+
+
+        # setup file format
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -178,6 +186,17 @@ class EncodingConverter:
                 action)
             self.iface.removeToolBarIcon(action)
 
+    def check(self, dlg):
+        #check char set
+        if dlg.encodingIn.text().strip()=="" or  dlg.encodingOut.text().strip()=="":
+            QtWidgets.QMessageBox.information( None, "Invalid parameter", "Please specify the input/output character set." )
+            return 0
+        #check path
+        if dlg.folderIn.filePath().strip()=="" or dlg.folderOut.filePath().strip()=="":
+            QtWidgets.QMessageBox.information( None, "Invalid parameter", "Please choose the input/output folder." )
+            return 0
+        #if everything is okay, now it is a simple check
+        return 1
 
     def run(self):
         """Run method that performs all the real work"""
@@ -186,14 +205,73 @@ class EncodingConverter:
         # Only create GUI ONCE in callback, so that it will only load when the plugin is started
         if self.first_start == True:
             self.first_start = False
-            dlg = EncodingConverterDialog()
-
+            self.dlg = EncodingConverterDialog()
+            
         # show the dialog
-        dlg.show()
-        # Run the dialog event loop
-        result = dlg.exec_()
-        # See if OK was pressed
+        self.dlg.show()
+        
+        ready = 0
+        result = 0
+        # until cancel or params passed validation
+        # do
+        result = self.dlg.exec_()
         if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
-            pass
+            ready = self.check(self.dlg)
+        # while
+        while ((not ready) and result):
+            #do
+            result = self.dlg.exec_()
+            if result:
+                ready = self.check(self.dlg)
+        
+        # finally do the work
+        if ready and result:
+            QtWidgets.QMessageBox.information( None, "Do the work", "Yes we can. But it will just run in the background." )
+            
+            ### char set
+            charsetIn = self.dlg.encodingIn.text().strip()
+            charsetOut = self.dlg.encodingOut.text().strip()
+            
+            ### path
+            pathIn = self.dlg.folderIn.filePath().strip()
+            pathOut = self.dlg.folderOut.filePath().strip()
+            
+            ### format = shp/mif
+            formatOption = self.dlg.format.currentText()
+            ogrFormat = "Mapinfo File"
+            ext = ".mif"
+            if formatOption == "ESRI Shape file (*.shp)":
+                ogrFormat = "ESRI Shapefile"
+                ext = ".shp"
+            
+            ### keep file structure or just copy into one folder
+            keep = 0
+            if self.dlg.optionKeep.isChecked():
+                keep = 1
+            
+            ### overwrite
+            replace = 0
+            if self.dlg.overwrite.isChecked():
+                replace = 1
+            #################
+            # The keep, replace param do not work right now
+            #################
+            # scan files
+            for dirpath,dirnames,filenames in os.walk(pathIn):
+                for file in filenames:
+                    # only process files of specified format
+                    if file.lower().endswith(ext):
+                        fullpathIn=os.path.join(dirpath,file)
+                        self.iface.messageBar().pushInfo("Processing", fullpathIn)
+                        layer = QgsVectorLayer(fullpathIn, "temp", "ogr")
+                        crs = layer.sourceCrs()
+                        layer.setProviderEncoding(charsetIn)
+                        fullPathOut = pathOut+"/"+file
+                        QgsVectorFileWriter.writeAsVectorFormat(layer,fullPathOut , charsetOut, crs, ogrFormat)
+                        self.iface.messageBar().pushSuccess("Finished", fullpathIn+"-->"+fullPathOut)
+
+            QtWidgets.QMessageBox.information( None, "Do the work", "Done." )
+        # done 
+
+    #def convertDir(self, dirOrFile, ext, outPath)        
+            
