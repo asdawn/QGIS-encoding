@@ -33,6 +33,7 @@ from .resources import *
 from .encoding_converter_dialog import EncodingConverterDialog
 import os.path
 import os
+import pathlib
 from qgis.gui import QgsMessageBar
 
 
@@ -195,8 +196,18 @@ class EncodingConverter:
         if dlg.folderIn.filePath().strip()=="" or dlg.folderOut.filePath().strip()=="":
             QtWidgets.QMessageBox.information( None, "Invalid parameter", "Please choose the input/output folder." )
             return 0
+        #check the same folder
+        if os.path.samefile(dlg.folderIn.filePath().strip(), dlg.folderOut.filePath().strip()):
+            QtWidgets.QMessageBox.information( None, "Invalid parameter", "Please choose another folder for output." )
+            return 0
         #if everything is okay, now it is a simple check
         return 1
+
+    def convertFile(self, pathIn, pathOut, charsetIn, charsetOut):
+        layer = QgsVectorLayer(pathIn, "temp", "ogr")
+        crs = layer.sourceCrs()
+        layer.setProviderEncoding(charsetIn)
+        QgsVectorFileWriter.writeAsVectorFormat(layer,fullPathOut , charsetOut, crs, ogrFormat)
 
     def run(self):
         """Run method that performs all the real work"""
@@ -244,34 +255,66 @@ class EncodingConverter:
                 ogrFormat = "ESRI Shapefile"
                 ext = ".shp"
             
-            ### keep file structure or just copy into one folder
+            ### param keep, keep file structure or just copy into one folder ###
             keep = 0
             if self.dlg.optionKeep.isChecked():
                 keep = 1
             
-            ### overwrite
+            ### flag replace, overwrite or skip existing files  ###
             replace = 0
             if self.dlg.overwrite.isChecked():
                 replace = 1
-            #################
-            # The keep, replace param do not work right now
-            #################
+            
             # scan files
             for dirpath,dirnames,filenames in os.walk(pathIn):
                 for file in filenames:
                     # only process files of specified format
                     if file.lower().endswith(ext):
+                        # flag skip, skip current file
+                        skip = 0
+                        # get the path
                         fullpathIn=os.path.join(dirpath,file)
                         self.iface.messageBar().pushInfo("Processing", fullpathIn)
-                        layer = QgsVectorLayer(fullpathIn, "temp", "ogr")
-                        crs = layer.sourceCrs()
-                        layer.setProviderEncoding(charsetIn)
-                        fullPathOut = pathOut+"/"+file
-                        QgsVectorFileWriter.writeAsVectorFormat(layer,fullPathOut , charsetOut, crs, ogrFormat)
-                        self.iface.messageBar().pushSuccess("Finished", fullpathIn+"-->"+fullPathOut)
-
+                        fullPathOut = ""
+                        # assure the directory
+                        #### flag keep=1, mkdirs
+                        if keep==1:
+                            ##############################################
+                            # simply replace to get the full path! 
+                            ##############################################
+                            fullPathOut = fullpathIn.replace(pathIn,pathOut,1)
+                            paraentDir = os.path.dirname(fullPathOut)
+                            if os.path.exists(paraentDir) and os.path.isdir(paraentDir):
+                                pass
+                            elif not os.path.isdir(paraentDir):
+                                skip = 1
+                                self.iface.messageBar().pushWarning("Failed: invalid output path, skip", "Name of output path conflits with existing file"+fullPathOut)
+                            else:
+                                os.makedirs(paraentDir)
+                        # keep=0, just use the file name
+                        else:
+                            fullPathOut = os.path.join(pathOut,file)
+                        
+                        if skip:
+                            pass
+                        else:
+                            #>>> check output path and write out
+                            #### flag replace ####
+                            if os.path.exists(fullPathOut):
+                                ##### warning: invalid output path
+                                if os.path.isdir(fullPathOut):
+                                    self.iface.messageBar().pushWarning("Failed: invalid outputpath, skip.", fullpathIn+"-->"+fullPathOut)                            
+                                ##### success: overwrited existing file
+                                elif replace:
+                                    convertFile(fullpathIn,fullPathOut,charsetIn,charsetOut)
+                                    self.iface.messageBar().pushSuccess("Overwrited", fullpathIn+"-->"+fullPathOut)
+                                ##### warning: skipped existing file
+                                else:
+                                    self.iface.messageBar().pushWarning("Skipped", fullpathIn+"-->"+fullPathOut)    
+                            else:
+                                convertFile(fullpathIn,fullPathOut,charsetIn,charsetOut)
+                                self.iface.messageBar().pushSuccess("Finished", fullpathIn+"-->"+fullPathOut)
+                            #>>> output end
+                        #end if skip
             QtWidgets.QMessageBox.information( None, "Do the work", "Done." )
         # done 
-
-    #def convertDir(self, dirOrFile, ext, outPath)        
-            
