@@ -316,6 +316,7 @@ class EncodingConverter:
                                 self.iface.messageBar().pushSuccess("Finished", fullpathIn+"-->"+fullPathOut)
                             #>>> output end
                         #end if skip
+            self.iface.messageBar().pushSuccess("Done", "Files are saved into "+pathOut+" using character set "+charsetOuts)
             QtWidgets.QMessageBox.information( None, "Do the work", "Done." )
         # done
 
