@@ -203,11 +203,11 @@ class EncodingConverter:
         #if everything is okay, now it is a simple check
         return 1
 
-    def convertFile(self, pathIn, pathOut, charsetIn, charsetOut):
+    def convertFile(self, pathIn, pathOut, charsetIn, charsetOut, ogrFormat):
         layer = QgsVectorLayer(pathIn, "temp", "ogr")
         crs = layer.sourceCrs()
         layer.setProviderEncoding(charsetIn)
-        QgsVectorFileWriter.writeAsVectorFormat(layer,fullPathOut , charsetOut, crs, ogrFormat)
+        QgsVectorFileWriter.writeAsVectorFormat(layer,pathOut , charsetOut, crs, ogrFormat)
 
     def run(self):
         """Run method that performs all the real work"""
@@ -306,15 +306,16 @@ class EncodingConverter:
                                     self.iface.messageBar().pushWarning("Failed: invalid outputpath, skip.", fullpathIn+"-->"+fullPathOut)                            
                                 ##### success: overwrited existing file
                                 elif replace:
-                                    convertFile(fullpathIn,fullPathOut,charsetIn,charsetOut)
+                                    self.convertFile(fullpathIn,fullPathOut,charsetIn,charsetOut, ogrFormat)
                                     self.iface.messageBar().pushSuccess("Overwrited", fullpathIn+"-->"+fullPathOut)
                                 ##### warning: skipped existing file
                                 else:
                                     self.iface.messageBar().pushWarning("Skipped", fullpathIn+"-->"+fullPathOut)    
                             else:
-                                convertFile(fullpathIn,fullPathOut,charsetIn,charsetOut)
+                                self.convertFile(fullpathIn,fullPathOut,charsetIn,charsetOut, ogrFormat)
                                 self.iface.messageBar().pushSuccess("Finished", fullpathIn+"-->"+fullPathOut)
                             #>>> output end
                         #end if skip
             QtWidgets.QMessageBox.information( None, "Do the work", "Done." )
-        # done 
+        # done
+

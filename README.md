@@ -12,5 +12,3 @@ This converter can read all vector files in a folder and its sub-folders, and sa
 + Character set: yes, you can specify the input character set. The default value is *System*, it depends on your OS.
 
 # Output
-
-
