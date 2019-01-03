@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>464</width>
-    <height>377</height>
+    <width>463</width>
+    <height>449</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>100</x>
-     <y>340</y>
+     <y>410</y>
      <width>341</width>
      <height>32</height>
     </rect>
@@ -141,7 +141,7 @@
      <x>10</x>
      <y>170</y>
      <width>441</width>
-     <height>161</height>
+     <height>131</height>
     </rect>
    </property>
    <property name="title">
@@ -227,11 +227,37 @@
      <string>UTF-8</string>
     </property>
    </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBoxProcessing">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>310</y>
+     <width>441</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Processing</string>
+   </property>
+   <widget class="QLabel" name="label_output_path_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Max thread</string>
+    </property>
+   </widget>
    <widget class="QCheckBox" name="overwrite">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>130</y>
+      <y>60</y>
       <width>391</width>
       <height>19</height>
      </rect>
@@ -247,6 +273,28 @@
     </property>
     <property name="checked">
      <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="threads">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>20</y>
+      <width>231</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Threads to use</string>
+    </property>
+    <property name="editable">
+     <bool>false</bool>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <property name="maxCount">
+     <number>100</number>
     </property>
    </widget>
   </widget>

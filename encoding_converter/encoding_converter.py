@@ -265,6 +265,23 @@ class EncodingConverter:
             if self.dlg.overwrite.isChecked():
                 replace = 1
             
+            ### param thread number
+            threadN = 1
+            threadChoice = self.dlg.threads.currentText()
+            if threadChoice == "2 threads":
+                threadN = 2
+            elif threadChoice == "4 threads":
+                threadN = 4
+            elif threadChoice == "8 threads":
+                threadN = 8
+            elif threadChoice == "16 threads":
+                threadN = 16
+            elif threadChoice == "unlimited - OS may crash!":
+            # 0 means unlimited
+                threadN = 0
+            else
+                threadN = 1
+
             # scan files
             for dirpath,dirnames,filenames in os.walk(pathIn):
                 for file in filenames:
