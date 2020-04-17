@@ -204,6 +204,8 @@ class EncodingConverter:
         return 1
 
     def convertFile(self, pathIn, pathOut, charsetIn, charsetOut, ogrFormat):
+        # the name of layer is not the identifier of layer (tested in python console, QGIS version 3.10 )
+        # so we do not have to get a unique name, just use "temp"
         layer = QgsVectorLayer(pathIn, "temp", "ogr")
         crs = layer.sourceCrs()
         layer.setProviderEncoding(charsetIn)
@@ -279,7 +281,7 @@ class EncodingConverter:
             elif threadChoice == "unlimited - OS may crash!":
             # 0 means unlimited
                 threadN = 0
-            else
+            else:
                 threadN = 1
 
             # scan files
@@ -299,15 +301,18 @@ class EncodingConverter:
                             ##############################################
                             # simply replace to get the full path! 
                             ##############################################
-                            fullPathOut = fullpathIn.replace(pathIn,pathOut,1)
-                            paraentDir = os.path.dirname(fullPathOut)
-                            if os.path.exists(paraentDir) and os.path.isdir(paraentDir):
+                            fullPathOut = fullpathIn.replace(pathIn, pathOut, 1)
+                            parentDir = os.path.dirname(fullPathOut)
+                            # validate the output folder name
+                            if os.path.exists(parentDir) and os.path.isdir(parentDir):
                                 pass
-                            elif not os.path.isdir(paraentDir):
+                            elif os.path.exists(parentDir) and os.path.isfile(parentDir):
                                 skip = 1
-                                self.iface.messageBar().pushWarning("Failed: invalid output path, skip", "Name of output path conflits with existing file"+fullPathOut)
+                                # though this file failed, the whole process will continue
+                                self.iface.messageBar().pushWarning("Failed: invalid output path, skip", "Name of output path conflicts with existing file "+parentDir)
                             else:
-                                os.makedirs(paraentDir)
+                                os.makedirs(parentDir)
+                                
                         # keep=0, just use the file name
                         else:
                             fullPathOut = os.path.join(pathOut,file)
@@ -333,7 +338,7 @@ class EncodingConverter:
                                 self.iface.messageBar().pushSuccess("Finished", fullpathIn+"-->"+fullPathOut)
                             #>>> output end
                         #end if skip
-            self.iface.messageBar().pushSuccess("Done", "Files are saved into "+pathOut+" using character set "+charsetOuts)
+            self.iface.messageBar().pushSuccess("Done", "Files are saved into "+pathOut+" using character set "+charsetOut)
             QtWidgets.QMessageBox.information( None, "Do the work", "Done." )
         # done
 
