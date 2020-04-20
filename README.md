@@ -47,7 +47,7 @@ This converter can read all vector files in a folder and its sub-folders, and sa
 
 ### Processing
 
-+ Max thread: number of background threads to use, now it only support 1 thread (safe mode)
++ Max thread: number of background threads to use. If it go wrong frequently, please try safe mode (use 1 thread).
 
 + overwrite existing files without notification: if checked, existing files will be overwritten. If not checked, existing files will not be overwritten and a warning message will be pushed to the message bar.
 
@@ -86,6 +86,10 @@ ogr2ogr is a good tool,  with the `PGCLIENTENCODING` variable you can specify th
     updated the version in metadata to 0.2a.
 
     completed the readme file.
+
++ ver 0.3
+
+    now multi-thread processing is available, though it still freeze the UI of QGIS.
 
 
 ## On develepment

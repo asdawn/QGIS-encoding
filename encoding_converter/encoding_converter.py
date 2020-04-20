@@ -27,6 +27,7 @@ from PyQt5.QtWidgets import QAction
 from PyQt5 import QtWidgets
 from qgis.core import QgsVectorLayer
 from qgis.core import QgsVectorFileWriter
+from qgis.gui import QgsMessageBar
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
@@ -34,7 +35,8 @@ from .encoding_converter_dialog import EncodingConverterDialog
 import os.path
 import os
 import pathlib
-from qgis.gui import QgsMessageBar
+import concurrent
+from concurrent.futures import ThreadPoolExecutor
 
 
 class EncodingConverter:
@@ -210,6 +212,7 @@ class EncodingConverter:
         crs = layer.sourceCrs()
         layer.setProviderEncoding(charsetIn)
         QgsVectorFileWriter.writeAsVectorFormat(layer,pathOut , charsetOut, crs, ogrFormat)
+        return 0
 
     def run(self):
         """Run method that performs all the real work"""
@@ -283,6 +286,10 @@ class EncodingConverter:
                 threadN = 0
             else:
                 threadN = 1
+           
+            ### create a thread pool
+            executor = ThreadPoolExecutor(max_workers=threadN)
+            tasklist = []
 
             # scan files
             for dirpath,dirnames,filenames in os.walk(pathIn):
@@ -328,16 +335,22 @@ class EncodingConverter:
                                     self.iface.messageBar().pushWarning("Failed: invalid outputpath, skip.", fullpathIn+"-->"+fullPathOut)                            
                                 ##### success: overwrited existing file
                                 elif replace:
-                                    self.convertFile(fullpathIn,fullPathOut,charsetIn,charsetOut, ogrFormat)
+                                    task =  executor.submit(self.convertFile, fullpathIn, fullPathOut, charsetIn, charsetOut, ogrFormat)
+                                    tasklist.append(task)
                                     self.iface.messageBar().pushSuccess("Overwrited", fullpathIn+"-->"+fullPathOut)
                                 ##### warning: skipped existing file
                                 else:
                                     self.iface.messageBar().pushWarning("Skipped", fullpathIn+"-->"+fullPathOut)    
                             else:
-                                self.convertFile(fullpathIn,fullPathOut,charsetIn,charsetOut, ogrFormat)
+                                task =  executor.submit(self.convertFile, fullpathIn, fullPathOut, charsetIn, charsetOut, ogrFormat)
+                                tasklist.append(task)
                                 self.iface.messageBar().pushSuccess("Finished", fullpathIn+"-->"+fullPathOut)
                             #>>> output end
                         #end if skip
+            ###  wait utill all tasks are finished
+            for future in concurrent.futures.as_completed(tasklist):
+                data = future.result()
+            
             self.iface.messageBar().pushSuccess("Done", "Files are saved into "+pathOut+" using character set "+charsetOut)
             QtWidgets.QMessageBox.information( None, "Do the work", "Done." )
         # done

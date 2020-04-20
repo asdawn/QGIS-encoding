@@ -10,7 +10,7 @@
 name=Batch Encoding Converter
 qgisMinimumVersion=3.0
 description=Convert the encoding of vector files in a folder and its sub-folder
-version=0.2a
+version=0.3
 author=Dong Lin
 email=dl@whu.edu.cn
 
