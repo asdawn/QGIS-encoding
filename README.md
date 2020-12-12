@@ -91,6 +91,11 @@ ogr2ogr is a good tool,  with the `PGCLIENTENCODING` variable you can specify th
 
     now multi-thread processing is available, though it still freeze the UI of QGIS.
 
++ ver 0.4
+
+    add .E00 input format.
+
+    add export format options.
 
 ## On develepment
 

@@ -201,7 +201,7 @@ class EncodingConverter:
         #check the same folder
         if os.path.samefile(dlg.folderIn.filePath().strip(), dlg.folderOut.filePath().strip()):
             QtWidgets.QMessageBox.information( None, "Invalid parameter", "Please choose another folder for output." )
-            return 0
+            return 0        
         #if everything is okay, now it is a simple check
         return 1
 
@@ -252,13 +252,21 @@ class EncodingConverter:
             pathIn = self.dlg.folderIn.filePath().strip()
             pathOut = self.dlg.folderOut.filePath().strip()
             
-            ### format = shp/mif
-            formatOption = self.dlg.format.currentText()
-            ogrFormat = "Mapinfo File"
-            ext = ".mif"
-            if formatOption == "ESRI Shape file (*.shp)":
-                ogrFormat = "ESRI Shapefile"
-                ext = ".shp"
+            ### formatIn = shp/mif/e00
+            extIn = ".mif"
+            formatOptionIn = self.dlg.format.currentText()                
+            if formatOptionIn == "ESRI Shape file (*.shp)":
+                extIn = ".shp"
+            elif formatOptionIn == "ESRI ArcInfo interchange file(*.E00)":                
+                extIn = ".e00"
+
+            ### formatOut = shp/mif
+            formatOptionOut = self.dlg.format2.currentText()
+            ogrFormatOut = "Mapinfo File"
+            extOut = ".mif"
+            if formatOptionOut == "ESRI Shape file (*.shp)":
+                ogrFormatOut = "ESRI Shapefile"
+                extOut = ".shp"
             
             ### param keep, keep file structure or just copy into one folder ###
             keep = 0
@@ -295,7 +303,7 @@ class EncodingConverter:
             for dirpath,dirnames,filenames in os.walk(pathIn):
                 for file in filenames:
                     # only process files of specified format
-                    if file.lower().endswith(ext):
+                    if file.lower().endswith(extIn):
                         # flag skip, skip current file
                         skip = 0
                         # get the path
@@ -309,6 +317,8 @@ class EncodingConverter:
                             # simply replace to get the full path! 
                             ##############################################
                             fullPathOut = fullpathIn.replace(pathIn, pathOut, 1)
+                            if(extIn != extOut):
+                                fullPathOut = fullPathOut[:-4]+extOut
                             parentDir = os.path.dirname(fullPathOut)
                             # validate the output folder name
                             if os.path.exists(parentDir) and os.path.isdir(parentDir):
@@ -335,14 +345,14 @@ class EncodingConverter:
                                     self.iface.messageBar().pushWarning("Failed: invalid outputpath, skip.", fullpathIn+"-->"+fullPathOut)                            
                                 ##### success: overwrited existing file
                                 elif replace:
-                                    task =  executor.submit(self.convertFile, fullpathIn, fullPathOut, charsetIn, charsetOut, ogrFormat)
+                                    task =  executor.submit(self.convertFile, fullpathIn, fullPathOut, charsetIn, charsetOut, ogrFormatOut)
                                     tasklist.append(task)
                                     self.iface.messageBar().pushSuccess("Overwrited", fullpathIn+"-->"+fullPathOut)
                                 ##### warning: skipped existing file
                                 else:
                                     self.iface.messageBar().pushWarning("Skipped", fullpathIn+"-->"+fullPathOut)    
                             else:
-                                task =  executor.submit(self.convertFile, fullpathIn, fullPathOut, charsetIn, charsetOut, ogrFormat)
+                                task =  executor.submit(self.convertFile, fullpathIn, fullPathOut, charsetIn, charsetOut, ogrFormatOut)
                                 tasklist.append(task)
                                 self.iface.messageBar().pushSuccess("Finished", fullpathIn+"-->"+fullPathOut)
                             #>>> output end

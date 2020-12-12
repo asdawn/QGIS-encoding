@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>463</width>
-    <height>449</height>
+    <height>485</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QDialogButtonBox" name="button_box">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>410</y>
+     <x>110</x>
+     <y>450</y>
      <width>341</width>
      <height>32</height>
     </rect>
@@ -139,9 +139,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>170</y>
+     <y>160</y>
      <width>441</width>
-     <height>131</height>
+     <height>181</height>
     </rect>
    </property>
    <property name="title">
@@ -180,7 +180,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>100</y>
+      <y>140</y>
       <width>391</width>
       <height>19</height>
      </rect>
@@ -202,7 +202,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>60</y>
+      <y>100</y>
       <width>111</width>
       <height>31</height>
      </rect>
@@ -215,7 +215,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>60</y>
+      <y>100</y>
       <width>113</width>
       <height>21</height>
      </rect>
@@ -227,12 +227,47 @@
      <string>UTF-8</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label_input_file_or_path_5">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Data format</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="format2">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>60</y>
+      <width>231</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Select vector data format</string>
+    </property>
+    <property name="editable">
+     <bool>false</bool>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <property name="maxCount">
+     <number>100</number>
+    </property>
+   </widget>
   </widget>
   <widget class="QGroupBox" name="groupBoxProcessing">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>310</y>
+     <y>350</y>
      <width>441</width>
      <height>91</height>
     </rect>

@@ -43,8 +43,11 @@ class EncodingConverterDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
-        self.format.addItem("ESRI Shape file (*.shp)")
+        self.format.addItem("ESRI Shape file (*.shp)")        
         self.format.addItem("MapInfo Mif file (*.mif)")
+        self.format.addItem("ESRI ArcInfo interchange file(*.E00)")
+        self.format2.addItem("ESRI Shape file (*.shp)")
+        self.format2.addItem("MapInfo Mif file (*.mif)")
         self.threads.addItem("1 thread (safe mode)")
         self.threads.addItem("2 threads")
         self.threads.addItem("4 threads")
